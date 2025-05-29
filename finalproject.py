@@ -44,10 +44,13 @@ def gamble(bet):
 
 def maxgamble(bet):
     global money
-    times = money / bet
-    while times != 0:
-        gamble(bet)
-        times -= 1
+    results = []
+    count = 0
+    while money >= bet:
+        outcome = gamble(bet)
+        results.append(outcome)
+        count += 1
+    return f"Max gambled {count} times! Results: {', '.join(results)}"
 
 # Boost overall win chance
 def boost_wins(cost=100):
