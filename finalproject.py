@@ -22,7 +22,7 @@ def normalize(odds):
     return {k: v / total for k, v in odds.items()}
 
 # Perform a spin
-def spin(bet):
+def gamble(bet):
     global money, odds
     r = random.random()
     total = 0
@@ -42,8 +42,15 @@ def spin(bet):
             return outcome
     return "no outcome"
 
+def maxgamble(bet):
+    global money
+    times = money / bet
+    while times != 0:
+        gamble(bet)
+        times -= 1
+
 # Boost overall win chance
-def boost_wins(cost=50):
+def boost_wins(cost=100):
     global money, odds
     if money < cost:
         return "Not enough money to boost."
@@ -60,7 +67,7 @@ def boost_wins(cost=50):
     return "Win odds boosted!"
 
 # Boost jackpot by taking from small/big win
-def boost_jackpot(cost=50):
+def boost_jackpot(cost=150):
     global money, odds
     if money < cost:
         return "Not enough money to boost jackpot."
@@ -80,16 +87,26 @@ message = ""
 bet = 0
 if "action" in data:
     action = data["action"].value
-    if action == "Spin" and "bet" in data:
+    if action == "Gamble" and "bet" in data:
         try:
             bet = int(data["bet"].value)
             if bet > 0 and bet <= money:
-                result = spin(bet)
-                message = f"Spin Result: {result}. Money: ${money:.2f}"
+                result = gamble(bet)
+                message = f"Gambling Results: {result}. Money: ${money:.2f}"
             else:
-                message = "Invalid bet amount."
+                message = ("Invalid bet amount.")
         except:
-            message = "Bet must be a number."
+            message = ("Bet must be a number.")
+    elif action == "Max Gamble" and "bet" in data:
+        try:
+            bet = int(data["bet"].value)
+            if bet > 0 and bet <= money:
+                result = maxgamble(bet)
+                message = f"Gambling Results: {result}. Money: ${money:.2f}"
+            else:
+                message = ("Invalid bet amount.")
+        except:
+            message = ("Bet must be a number.")
     elif action == "Boost Odds":
         message = boost_wins()
     elif action == "Boost Jackpot":
@@ -99,14 +116,15 @@ if "action" in data:
 print("""
 <html>
 <head>
-    <title>Spin & Boost Game</title>
+    <title>Gambling</title>
 </head>
 <body>
-    <h1>Spin & Boost</h1>
+    <h1>Gambling</h1>
     <p>Money: ${:.2f}</p>
     <form method="get">
         Bet Amount: <input type="text" name="bet">
-        <input type="submit" name="action" value="Spin">
+        <input type="submit" name="action" value="Gamble">
+        <input type="submit" name="action" value="Max Gamble">
         <input type="submit" name="action" value="Boost Odds">
         <input type="submit" name="action" value="Boost Jackpot">
     </form>
