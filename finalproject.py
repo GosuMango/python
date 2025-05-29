@@ -4,18 +4,45 @@ print("Content-type: text/html\n")
 import cgi
 import cgitb
 import random
+import json
+import os
 
 cgitb.enable()
 
-# Game state (in practice, store/load from file)
-money = 1000
-odds = {
-    "full loss": 0.45,
-    "small loss": 0.25,
-    "small win": 0.25,
-    "big win": 0.04,
-    "jackpot": 0.01
-}
+# Path to store game state
+STATE_FILE = "/home/students/yourusername/finalproject_state.json"  # CHANGE THIS!
+
+# Load game state
+def load_state():
+    global money, odds
+    if os.path.exists(STATE_FILE):
+        with open(STATE_FILE, "r") as f:
+            data = json.load(f)
+            money = data.get("money", 1000)
+            odds = data.get("odds", {
+                "full loss": 0.45,
+                "small loss": 0.25,
+                "small win": 0.25,
+                "big win": 0.04,
+                "jackpot": 0.01
+            })
+    else:
+        money = 1000
+        odds = {
+            "full loss": 0.45,
+            "small loss": 0.25,
+            "small win": 0.25,
+            "big win": 0.04,
+            "jackpot": 0.01
+        }
+
+# Save game state
+def save_state():
+    with open(STATE_FILE, "w") as f:
+        json.dump({"money": money, "odds": odds}, f)
+
+# Initialize state
+load_state()
 
 def normalize(odds):
     total = sum(odds.values())
@@ -42,15 +69,14 @@ def gamble(bet):
             return outcome
     return "no outcome"
 
+# Max gamble: spend all money in repeated bets
 def maxgamble(bet):
     global money
     results = []
-    count = 0
     while money >= bet:
-        outcome = gamble(bet)
-        results.append(outcome)
-        count += 1
-    return f"Max gambled {count} times! Results: {', '.join(results)}"
+        result = gamble(bet)
+        results.append(result)
+    return results
 
 # Boost overall win chance
 def boost_wins(cost=100):
@@ -95,35 +121,38 @@ if "action" in data:
             bet = int(data["bet"].value)
             if bet > 0 and bet <= money:
                 result = gamble(bet)
-                message = f"Gambling Results: {result}. Money: ${money:.2f}"
+                message = f"Gambling Result: {result}. Money: ${money:.2f}"
             else:
-                message = ("Invalid bet amount.")
+                message = "Invalid bet amount."
         except:
-            message = ("Bet must be a number.")
+            message = "Bet must be a number."
     elif action == "Max Gamble" and "bet" in data:
         try:
             bet = int(data["bet"].value)
             if bet > 0 and bet <= money:
-                result = maxgamble(bet)
-                message = f"Gambling Results: {result}. Money: ${money:.2f}"
+                results = maxgamble(bet)
+                message = f"Max Gambling Results: {', '.join(results)}. Money: ${money:.2f}"
             else:
-                message = ("Invalid bet amount.")
+                message = "Invalid bet amount."
         except:
-            message = ("Bet must be a number.")
+            message = "Bet must be a number."
     elif action == "Boost Odds":
         message = boost_wins()
     elif action == "Boost Jackpot":
         message = boost_jackpot()
 
+# Save state after action
+save_state()
+
 # HTML Output
-print("""
+print(f"""
 <html>
 <head>
     <title>Gambling</title>
 </head>
 <body>
     <h1>Gambling</h1>
-    <p>Money: ${:.2f}</p>
+    <p>Money: ${money:.2f}</p>
     <form method="get">
         Bet Amount: <input type="text" name="bet">
         <input type="submit" name="action" value="Gamble">
@@ -131,10 +160,10 @@ print("""
         <input type="submit" name="action" value="Boost Odds">
         <input type="submit" name="action" value="Boost Jackpot">
     </form>
-    <p>{}</p>
+    <p>{message}</p>
     <h2>Current Odds:</h2>
     <ul>
-""".format(money, message))
+""")
 
 for outcome in odds:
     print(f"<li>{outcome}: {odds[outcome]*100:.2f}%</li>")
