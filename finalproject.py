@@ -10,8 +10,7 @@ import os
 cgitb.enable()
 
 # Path to store game state
-STATE_FILE = "/home/students/yourusername/finalproject_state.json"  # CHANGE THIS!
-
+STATE_FILE = "/home/students/odd/2027/myu70/public_html/py/data/finalproject_state" 
 # Load game state
 def load_state():
     global money, odds
@@ -110,6 +109,14 @@ def boost_jackpot(cost=150):
     odds = normalize(odds)
     return "Jackpot chance boosted!"
 
+def brokey():
+    global money, odds
+    if money <= 250:
+        money += 500
+    elif money > 250:
+        return("Stop being a greedy bum")
+
+
 # Handle form input
 data = cgi.FieldStorage()
 message = ""
@@ -125,7 +132,7 @@ if "action" in data:
             else:
                 message = "Invalid bet amount."
         except:
-            message = "Bet must be a number."
+            message = "Bet must be a whole number."
     elif action == "Max Gamble" and "bet" in data:
         try:
             bet = int(data["bet"].value)
@@ -135,11 +142,14 @@ if "action" in data:
             else:
                 message = "Invalid bet amount."
         except:
-            message = "Bet must be a number."
+            message = "Bet must be a whole number."
     elif action == "Boost Odds":
         message = boost_wins()
     elif action == "Boost Jackpot":
         message = boost_jackpot()
+    elif action == "broke?":
+        message = brokey()
+        message = "moneysss"
 
 # Save state after action
 save_state()
@@ -159,6 +169,9 @@ print(f"""
         <input type="submit" name="action" value="Max Gamble">
         <input type="submit" name="action" value="Boost Odds">
         <input type="submit" name="action" value="Boost Jackpot">
+        <br>
+        <br>
+        <input type="submit" name="action" value="broke?">
     </form>
     <p>{message}</p>
     <h2>Current Odds:</h2>
