@@ -12,6 +12,22 @@ cgitb.enable()
 # State file path
 STATE_FILE = "/home/students/odd/2027/myu70/public_html/py/data/finalproject_state"
 
+# Title mapping
+titles = {
+    (-float('inf'), -1_000_000): "Bottomless Pit Dweller",
+    (-1_000_000, -100_000): "Financial Abyss Navigator",
+    (-100_000, 0): "Useless Degenerate Gambler",
+    (0, 1_000_000): "Cautiously Hopeful Highroller",
+    (1_000_000, float('inf')): "Supreme Gambling Deity"
+}
+
+# Get title based on money
+def get_title(money):
+    for (low, high), title in titles.items():
+        if low < money <= high:
+            return title
+    return "Gambler"
+
 # Load game state
 def load_state():
     global money, odds
@@ -151,14 +167,17 @@ if "action" in data:
 # Save state
 save_state()
 
+# Get title based on current money
+player_title = get_title(money)
+
 # Output HTML
 print(f"""
 <html>
 <head>
-    <title>Gambling</title>
+    <title>{player_title}</title>
 </head>
 <body>
-    <h1>Gambling Game</h1>
+    <h1>{player_title}</h1>
     <p><strong>Money:</strong> ${money:.2f}</p>
     <form method="get">
         Bet Amount: <input type="text" name="bet">
