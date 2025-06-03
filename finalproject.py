@@ -9,14 +9,16 @@ import os
 
 cgitb.enable()
 
+# State file path
 STATE_FILE = "/home/students/odd/2027/myu70/public_html/py/data/finalproject_state"
 
+# Load game state
 def load_state():
     global money, odds
     if os.path.exists(STATE_FILE):
         with open(STATE_FILE, "r") as f:
             data = json.load(f)
-            money = data.get("money", 1000)
+            money = data.get("money", 1000.0)
             odds = data.get("odds", {
                 "full loss": 0.45,
                 "small loss": 0.25,
@@ -25,7 +27,7 @@ def load_state():
                 "jackpot": 0.01
             })
     else:
-        money = 1000
+        money = 1000.0
         odds = {
             "full loss": 0.45,
             "small loss": 0.25,
@@ -34,16 +36,17 @@ def load_state():
             "jackpot": 0.01
         }
 
+# Save game state
 def save_state():
     with open(STATE_FILE, "w") as f:
         json.dump({"money": money, "odds": odds}, f)
 
-load_state()
-
+# Normalize odds
 def normalize(odds):
     total = sum(odds.values())
     return {k: v / total for k, v in odds.items()}
 
+# Gambling function
 def gamble(bet):
     global money, odds
     r = random.random()
@@ -64,14 +67,16 @@ def gamble(bet):
             return outcome
     return "no outcome"
 
-def multi_gamble(count, bet):
+# Multiple gamble function
+def multigamble(bet, times):
     results = []
-    for _ in range(count):
-        if money < bet:
-            break
-        results.append(gamble(bet))
+    for _ in range(times):
+        if bet > 0:
+            result = gamble(bet)
+            results.append(result)
     return results
 
+# Boost win odds
 def boost_wins(cost=100):
     global money, odds
     if money < cost:
@@ -88,6 +93,7 @@ def boost_wins(cost=100):
     odds = normalize(odds)
     return "Win odds boosted!"
 
+# Boost jackpot odds
 def boost_jackpot(cost=150):
     global money, odds
     if money < cost:
@@ -102,41 +108,39 @@ def boost_jackpot(cost=150):
     odds = normalize(odds)
     return "Jackpot chance boosted!"
 
+# Emergency cash
 def brokey():
-    global money, odds
+    global money
     if money <= 250:
         money += 500
-        return "Here’s $500 to keep playing."
-    else:
-        return "Stop being a greedy bum"
+        return "You were given $500."
+    return "Stop being a greedy bum."
 
-# Handle form input
+# Load state
+load_state()
+
+# Handle form data
 data = cgi.FieldStorage()
 message = ""
-bet = 0
+
 if "action" in data:
     action = data["action"].value
-    if action == "Gamble" and "bet" in data:
-        try:
-            bet = int(data["bet"].value)
-            if bet > 0 and bet <= money:
-                result = gamble(bet)
-                message = f"Gambling Result: {result}. Money: ${money:.2f}"
-            else:
-                message = "Invalid bet amount."
-        except:
-            message = "Bet must be a whole number."
-    elif action in ["3x Gamble", "5x Gamble", "10x Gamble"] and "bet" in data:
-        try:
-            bet = int(data["bet"].value)
-            count = int(action.split("x")[0])
-            if bet > 0 and money >= bet:
-                results = multi_gamble(count, bet)
-                message = f"{count}x Gambling Results: {', '.join(results)}. Money: ${money:.2f}"
-            else:
-                message = "Invalid bet amount or not enough money."
-        except:
-            message = "Bet must be a whole number."
+    bet = float(data.getfirst("bet", "0"))
+    max_bet = abs(money) * 1.5 if money < 0 else money * 1.5
+
+    if action == "Gamble":
+        if bet > 0 and bet <= max_bet:
+            result = gamble(bet)
+            message = f"Gambling Result: {result}. Money: ${money:.2f}"
+        else:
+            message = "Invalid bet. Must be a positive number up to 1.5x your balance."
+    elif action in ["3x Gamble", "5x Gamble", "10x Gamble"]:
+        multiplier = int(action.split("x")[0])
+        if bet > 0 and bet <= max_bet:
+            results = multigamble(bet, multiplier)
+            message = f"{action} Results: {', '.join(results)}. Money: ${money:.2f}"
+        else:
+            message = "Invalid bet. Must be a positive number up to 1.5x your balance."
     elif action == "Boost Odds":
         message = boost_wins()
     elif action == "Boost Jackpot":
@@ -147,24 +151,24 @@ if "action" in data:
 # Save state
 save_state()
 
-# HTML Output
+# Output HTML
 print(f"""
 <html>
 <head>
     <title>Gambling</title>
 </head>
 <body>
-    <h1>Gambling</h1>
-    <p>Money: ${money:.2f}</p>
+    <h1>Gambling Game</h1>
+    <p><strong>Money:</strong> ${money:.2f}</p>
     <form method="get">
         Bet Amount: <input type="text" name="bet">
         <input type="submit" name="action" value="Gamble">
         <input type="submit" name="action" value="3x Gamble">
         <input type="submit" name="action" value="5x Gamble">
         <input type="submit" name="action" value="10x Gamble">
+        <br><br>
         <input type="submit" name="action" value="Boost Odds">
         <input type="submit" name="action" value="Boost Jackpot">
-        <br><br>
         <input type="submit" name="action" value="broke?">
     </form>
     <p>{message}</p>
