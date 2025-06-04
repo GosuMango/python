@@ -1,0 +1,7 @@
+    elif action == "Restart":
+        if os.path.exists(STATE_FILE):
+            os.remove(STATE_FILE)
+        load_state()  # Reload the default state
+        message = "Game has been reset."
+
+<input type="submit" name="action" value="Restart">
