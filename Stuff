@@ -6,13 +6,13 @@
 
 <input type="submit" name="action" value="Restart">
 
-if money < -1500000:
+if money < -100000:
     print(f"""
     <html>
     <head><title>You're Done</title></head>
     <body>
         <h1>Game Over</h1>
-        <p>You are more than $1.5 million in debt. No more gambling for you.</p>
+        <p>You are more than $100,000 in debt. No more gambling for you.</p>
     </body>
     </html>
     """)
