@@ -9,26 +9,25 @@ import os
 
 cgitb.enable()
 
-# State file path
-STATE_FILE = "/home/students/odd/2027/myu70/public_html/py/data/finalproject_state"
+STATE_FILE = "/home/students/odd/2027/myu70/public_html/final/memory"
 
-# Title mapping
+
 titles = {
-    (-float('inf'), -1_000_000): "Bottomless Pit Dweller",
-    (-1_000_000, -100_000): "Financial Abyss Navigator",
-    (-100_000, 0): "Useless Degenerate Gambler",
-    (0, 1_000_000): "Cautiously Hopeful Highroller",
-    (1_000_000, float('inf')): "Supreme Gambling Deity"
+    (-float('inf'), -1000000): "Beyond Homeless 🥀❤️‍🩹",
+    (-1000000, -10000): "Big Bum 🥀",
+    (-10000, 2500): "Lvl 1 Crook",
+    (2500, 10000): "Lvl 25 Mafia Member",
+    (10000, 1000000): "Lvl 100 Mafia Boss",
+    (1000000, float('inf')): "Supreme Gambling Entity"
 }
 
-# Get title based on money
+
 def get_title(money):
     for (low, high), title in titles.items():
         if low < money <= high:
             return title
     return "Gambler"
 
-# Load game state
 def load_state():
     global money, odds
     if os.path.exists(STATE_FILE):
@@ -52,17 +51,14 @@ def load_state():
             "jackpot": 0.01
         }
 
-# Save game state
 def save_state():
     with open(STATE_FILE, "w") as f:
         json.dump({"money": money, "odds": odds}, f)
 
-# Normalize odds
 def normalize(odds):
     total = sum(odds.values())
     return {k: v / total for k, v in odds.items()}
 
-# Gambling function
 def gamble(bet):
     global money, odds
     r = random.random()
@@ -83,7 +79,6 @@ def gamble(bet):
             return outcome
     return "no outcome"
 
-# Multiple gamble function
 def multigamble(bet, times):
     results = []
     for _ in range(times):
@@ -92,14 +87,13 @@ def multigamble(bet, times):
             results.append(result)
     return results
 
-# Boost win odds
 def boost_wins(cost=100):
     global money, odds
     if money < cost:
         return "Not enough money to boost."
     money -= cost
-    reduce_full = min(0.005, odds["full loss"])
-    reduce_small = min(0.005, odds["small loss"])
+    reduce_full = min(0.01, odds["full loss"])
+    reduce_small = min(0.01, odds["small loss"])
     gain = reduce_full + reduce_small
     odds["full loss"] -= reduce_full
     odds["small loss"] -= reduce_small
@@ -109,14 +103,13 @@ def boost_wins(cost=100):
     odds = normalize(odds)
     return "Win odds boosted!"
 
-# Boost jackpot odds
 def boost_jackpot(cost=150):
     global money, odds
     if money < cost:
         return "Not enough money to boost jackpot."
     money -= cost
-    reduce_small_win = min(0.005, odds["small win"])
-    reduce_big_win = min(0.005, odds["big win"])
+    reduce_small_win = min(0.01, odds["small win"])
+    reduce_big_win = min(0.01, odds["big win"])
     total_gain = reduce_small_win + reduce_big_win
     odds["small win"] -= reduce_small_win
     odds["big win"] -= reduce_big_win
@@ -124,7 +117,6 @@ def boost_jackpot(cost=150):
     odds = normalize(odds)
     return "Jackpot chance boosted!"
 
-# Emergency cash
 def brokey():
     global money
     if money <= 250:
@@ -132,10 +124,8 @@ def brokey():
         return "You were given $500."
     return "Stop being a greedy bum."
 
-# Load state
 load_state()
 
-# Handle form data
 data = cgi.FieldStorage()
 message = ""
 
@@ -149,57 +139,62 @@ if "action" in data:
             result = gamble(bet)
             message = f"Gambling Result: {result}. Money: ${money:.2f}"
         else:
-            message = "Invalid bet. Must be a positive number up to 1.5x your balance."
+            message = "<p class = 'bigsize'> Invalid bet. Must be a positive number up to 1.5x your balance. </p>"
     elif action in ["3x Gamble", "5x Gamble", "10x Gamble"]:
         multiplier = int(action.split("x")[0])
-        if bet > 0 and bet <= max_bet:
+        if bet > 0 and bet * multiplier <= max_bet:
             results = multigamble(bet, multiplier)
             message = f"{action} Results: {', '.join(results)}. Money: ${money:.2f}"
         else:
-            message = "Invalid bet. Must be a positive number up to 1.5x your balance."
+            message = "<p class = 'bigsize'> Invalid bet. Must be a positive number up to 1.5x your balance. </p>"
     elif action == "Boost Odds":
         message = boost_wins()
     elif action == "Boost Jackpot":
         message = boost_jackpot()
     elif action == "broke?":
         message = brokey()
+    elif action == "Restart?":
+        if os.path.exists(STATE_FILE):
+            os.remove(STATE_FILE)
+        load_state()
+        message = "Game has been reset."
 
-# Save state
-save_state()
-
-# Get title based on current money
 player_title = get_title(money)
 
-# Output HTML
 print(f"""
 <html>
 <head>
+    <meta charset="utf-8">
+    <link href="final.css" rel="stylesheet">
     <title>{player_title}</title>
 </head>
 <body>
-    <h1>{player_title}</h1>
-    <p><strong>Money:</strong> ${money:.2f}</p>
-    <form method="get">
-        Bet Amount: <input type="text" name="bet">
-        <input type="submit" name="action" value="Gamble">
-        <input type="submit" name="action" value="3x Gamble">
-        <input type="submit" name="action" value="5x Gamble">
-        <input type="submit" name="action" value="10x Gamble">
+    <p class = "bigsize"> {player_title} </p>
+    <p class = "bigsize"> <strong>Money:</strong> ${money:.2f}</p>
+    <form method="get" class = "bigsize">
+        Bet Amount: <input type="text" class = "bigsize" name="bet">
+        <input type="submit" name="action" class = "bigsize" value="Gamble">
+        <input type="submit" name="action" class = "bigsize" value="3x Gamble">
+        <input type="submit" name="action" class = "bigsize" value="5x Gamble">
+        <input type="submit" name="action" class = "bigsize" value="10x Gamble">
         <br><br>
-        <input type="submit" name="action" value="Boost Odds">
-        <input type="submit" name="action" value="Boost Jackpot">
-        <input type="submit" name="action" value="broke?">
+        <input type="submit" name="action" class = "bigsize" value="Boost Odds">
+        <input type="submit" name="action" class = "bigsize" value="Boost Jackpot">
+        <input type="submit" name="action" class = "bigsize" value="broke?">
+        <input type="submit" name="action" class =      "bigsize"value="Restart?">       
     </form>
     <p>{message}</p>
-    <h2>Current Odds:</h2>
+    <p class = "bigsize">Current Odds:</p>
     <ul>
 """)
 
 for outcome in odds:
-    print(f"<li>{outcome}: {odds[outcome]*100:.2f}%</li>")
+    print(f"<li class = 'bigsize'>{outcome}: {odds[outcome]*100:.2f}%</li>")
 
 print("""
     </ul>
 </body>
 </html>
 """)
+
+save_state()
