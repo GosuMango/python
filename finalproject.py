@@ -9,7 +9,7 @@ import os
 
 cgitb.enable()
 
-STATE_FILE = "/home/students/odd/2027/myu70/public_html/final/memory"
+STATE_FILE = "/home/students/odd/2027/myu70/public_html/final/finalextras/memory"
 
 
 titles = {
@@ -90,7 +90,7 @@ def multigamble(bet, times):
 def boost_wins(cost=100):
     global money, odds
     if money < cost:
-        return "Not enough money to boost."
+        return "<p class = 'bigsize'> Not enough money to boost. </p>"
     money -= cost
     reduce_full = min(0.01, odds["full loss"])
     reduce_small = min(0.01, odds["small loss"])
@@ -101,12 +101,12 @@ def boost_wins(cost=100):
     odds["big win"] += gain * 0.3
     odds["jackpot"] += gain * 0.2
     odds = normalize(odds)
-    return "Win odds boosted!"
+    return "<p class = 'bigsize'> Win odds boosted! </p>"
 
 def boost_jackpot(cost=150):
     global money, odds
     if money < cost:
-        return "Not enough money to boost jackpot."
+        return "<p class = 'bigsize'> Not enough money to boost jackpot. </p>"
     money -= cost
     reduce_small_win = min(0.01, odds["small win"])
     reduce_big_win = min(0.01, odds["big win"])
@@ -115,14 +115,14 @@ def boost_jackpot(cost=150):
     odds["big win"] -= reduce_big_win
     odds["jackpot"] += total_gain
     odds = normalize(odds)
-    return "Jackpot chance boosted!"
+    return "<p class = 'bigsize'> Jackpot chance boosted! </p>"
 
 def brokey():
     global money
     if money <= 250:
         money += 500
         return "You were given $500."
-    return "Stop being a greedy bum."
+    return "<p class = 'bigsize'>Stop being a greedy bum. </p>"
 
 load_state()
 
@@ -137,7 +137,7 @@ if "action" in data:
     if action == "Gamble":
         if bet > 0 and bet <= max_bet:
             result = gamble(bet)
-            message = f"Gambling Result: {result}. Money: ${money:.2f}"
+            message = f"<p class = 'bigsize'> Gambling Result: {result}. Money: ${money:.2f} </p>"
         else:
             message = "<p class = 'bigsize'> Invalid bet. Must be a positive number up to 1.5x your balance. </p>"
     elif action in ["3x Gamble", "5x Gamble", "10x Gamble"]:
@@ -157,7 +157,7 @@ if "action" in data:
         if os.path.exists(STATE_FILE):
             os.remove(STATE_FILE)
         load_state()
-        message = "Game has been reset."
+        message = "<p class = 'bigsize'> Game has been reset. </p>"
 
 player_title = get_title(money)
 
