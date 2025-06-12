@@ -1,19 +1,6 @@
-    elif action == "Restart":
-        if os.path.exists(STATE_FILE):
-            os.remove(STATE_FILE)
-        load_state()  # Reload the default state
-        message = "Game has been reset."
-
-<input type="submit" name="action" value="Restart">
-
-if money < -100000:
-    print(f"""
-    <html>
-    <head><title>You're Done</title></head>
-    <body>
-        <h1>Game Over</h1>
-        <p>You are more than $100,000 in debt. No more gambling for you.</p>
-    </body>
-    </html>
-    """)
-    exit()
+Traceback (most recent call last):
+  File "/home/students/odd/2027/myu70/public_html/final/finalproject.py", line 192, in <module>
+    save_state()
+  File "/home/students/odd/2027/myu70/public_html/final/finalproject.py", line 47, in save_state
+    with open(STATE_FILE, "w") as f:
+PermissionError: [Errno 13] Permission denied: '/home/students/odd/2027/myu70/public_html/final/memory'
