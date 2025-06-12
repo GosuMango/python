@@ -9,7 +9,7 @@ import os
 
 cgitb.enable()
 
-STATE_FILE = "/home/students/odd/2027/myu70/public_html/final/finalextras/memory"
+STATE_FILE = "/home/students/odd/2027/myu70/public_html/final/memory"
 
 
 titles = {
@@ -21,15 +21,12 @@ titles = {
     (1000000, float('inf')): "Supreme Gambling Entity"
 }
 
-
 def get_title(money):
     for (low, high), title in titles.items():
         if low < money <= high:
             return title
-    return "Gambler"
 
 def load_state():
-    global money, odds
     if os.path.exists(STATE_FILE):
         with open(STATE_FILE, "r") as f:
             data = json.load(f)
