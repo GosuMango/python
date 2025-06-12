@@ -11,6 +11,15 @@ cgitb.enable()
 
 STATE_FILE = "/home/students/odd/2027/myu70/public_html/final/memory"
 
+money = 1000
+
+odds = {
+            "full loss": 0.45,
+            "small loss": 0.25,
+            "small win": 0.25,
+            "big win": 0.04,
+            "jackpot": 0.01
+        }
 
 titles = {
     (-float('inf'), -1000000): "Beyond Homeless 🥀❤️‍🩹",
