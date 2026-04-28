@@ -1,0 +1,137 @@
+/*
+ * SNAKE GAME
+ * Rules:
+ *     Eat the food
+ *     Do not bite your own tail
+ *     Do not hit a wall
+ * Specifications:
+ *     The snake grows when eat food
+ *     The speed increases when the snake grows
+ *     Food is displayed randomly
+ *     Food and parts of the snake body are squares
+ */
+
+// global variables
+ArrayList<PVector> snake = new ArrayList<PVector>(); // snake body (head is not included)
+PVector pos; // snake position (head's position)
+
+String [] mode_list = {"border", "no_border"}; // if you implement both functionalities
+int mode_pos = 1; // mode 1 by default - if hits wall wraps around
+String actual_mode = mode_list[mode_pos]; // current mode name
+
+PVector food; // food position
+
+PVector dir = new PVector(1, 0); // snake direction (up, down, left right)
+
+int size = 40; // snake and food square size
+int w, h; // grid dimensions (how many squares fit)
+
+int spd = 20; // speed (smaller spd will make the snake move faster)
+int len = 4; // snake body
+
+void setup() {
+  size(1080, 720);
+  w = width/size;
+  h = height/size;
+  
+  pos = new PVector(w/2, h/2); // Initial snake position
+  newFood(); // create 2D vector
+  
+  noStroke();
+  fill(0);
+}
+
+void draw() {
+  background(125,255,150);
+  drawSnake();
+  drawFood();
+  
+  if(frameCount % spd == 0) {
+    updateSnake();   
+  }
+}
+
+void drawFood() {
+  rect(food.x * size, food.y * size, size, size);
+}
+
+void newFood() {
+  while (true) {
+    int x = (int) random(0, w);
+    int y = (int) random(0, h);
+    boolean onSnake = false;
+    
+    if (pos.x == x && pos.y == y) onSnake = true;
+    
+    for (PVector part : snake) {
+      if (part.x == x && part.y == y) {
+        onSnake = true;
+        break;
+      }
+    }
+    
+    if (!onSnake) {
+      food = new PVector(x, y);
+      break;
+    }
+  }
+}
+
+void drawSnake() {
+  rect(pos.x * size, pos.y * size, size, size);
+  for (int i = 0; i < snake.size(); i++){
+    PVector part = snake.get(i);
+    rect(part.x * size, part.y * size, size, size);
+  }
+}
+
+void updateSnake() {
+  snake.add(pos.copy());
+  
+  if (snake.size() > len) {
+    snake.remove(0);
+  }
+  
+  pos.add(dir);
+  
+  if (actual_mode.equals("no_border")) {
+    if (pos.x < 0) pos.x = w - 1;
+    if (pos.x >= w) pos.x = 0;
+    if (pos.y < 0) pos.y = h - 1;
+    if (pos.y >= h) pos.y = 0;
+  } else {
+    if (pos.x < 0 || pos.x >= w || pos.y < 0 || pos.y >= h) {
+      reset();
+      return;
+    }
+  }
+  
+  if (pos.x == food.x && pos.y == food.y) {
+    len++;
+    spd = max(8, spd - 1);
+    newFood();
+  }
+  
+  for (PVector part : snake) {
+    if (part.x == pos.x && part.y == pos.y) {
+      reset();
+      return;
+    }
+  }
+}
+
+void reset() {
+  spd = 20;
+  len = 4;
+  pos = new PVector(w/2, h/2);
+  dir = new PVector(1, 0);
+  newFood();
+  snake = new ArrayList<PVector>();
+}
+
+void keyPressed() {
+  if (key == 'w' && dir.y != 1) dir = new PVector(0, -1);
+  if (key == 's' && dir.y != -1) dir = new PVector(0, 1);
+  if (key == 'a' && dir.x != 1) dir = new PVector(-1, 0);
+  if (key == 'd' && dir.x != -1) dir = new PVector(1, 0);
+}
