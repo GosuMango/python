@@ -1,0 +1,86 @@
+PImage bird;
+PImage output;
+int currentKernel = 0;
+Kernel[] kernels;
+String[] names;
+
+void setup(){
+  size(1370,800);
+  bird = loadImage("bird.jpg");
+  output = bird.copy();
+  
+  names = new String[]{
+    "Identity", "Blur", "Sharpen",
+    "Outline", "Left Sobel", "Right Sobel",
+    "Top Sobel", "Emboss"
+  };
+  
+  kernels = new Kernel[] {
+    new Kernel( new float[][] {
+      {0, 0, 0},
+      {0, 1, 0},
+      {0, 0, 0}
+    }) ,
+    new Kernel( new float[][] {
+      {.111, .111, .111},
+      {.111, .111, .111},
+      {.111, .111, .111}
+    }) ,
+    new Kernel( new float[][] {
+      {0, -1, 0},
+      {-1, 5, -1},
+      {0, -1, 0}
+    }) ,
+    new Kernel( new float[][] {
+      {-1, -1, -1},
+      {-1, 8, -1},
+      {-1, -1, -1}
+    }) ,
+    new Kernel( new float[][] {
+      {1, 0, -1},
+      {2, 0, -2},
+      {1, 0, -1}
+    }) ,
+    new Kernel( new float[][] {
+      {-1, 0, 1},
+      {-2, 0, 2},
+      {-1, 0, 1}
+    }) ,
+    new Kernel( new float[][] {
+      {1, 2,  1},
+      {0, 0, 0},
+      {-1, -2, -1}
+    }),
+    new Kernel( new float[][] {
+      {-2, -1,  0},
+      {-1, 1, 1},
+      {0, 1, 2}
+    })
+  };
+}
+
+void keyPressed(){
+  if (key == '1'){ 
+    currentKernel += 1;
+    if (currentKernel > kernels.length - 1){
+      currentKernel = 0;
+    }
+    kernels[currentKernel].apply(bird, output);
+  }
+  if (key == '2'){
+    currentKernel -= 1;
+    if (currentKernel < 0){
+      currentKernel = kernels.length - 1;
+    }
+    kernels[currentKernel].apply(bird, output);
+  }
+}
+
+void draw(){
+ // k2.apply(bird, output);
+  background(0);
+  image(bird,0,0);
+  image(output, bird.width,0);
+  fill(255);
+  text(names[currentKernel], 20, 40);
+}
