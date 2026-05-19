@@ -1,0 +1,53 @@
+public class Map2{
+  color[][] map = new color[20][20];
+  final int SQUARE_SIZE = 40;
+  final color SKY = color(0,200,255);
+  final color CLOUD = color(230);
+  
+  public void drawMap(){
+    
+    fill(SKY);
+    noStroke();
+    for (int r = 0; r < 20; r++) {
+      for (int c = 0; c < map[r].length; c++) {
+        rect(c * SQUARE_SIZE, r * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE);
+      }
+    }
+
+    fill(CLOUD);
+    for (int r = 6; r < 8; r++) {
+      for (int c = 3; c < 5; c++) {
+        rect(c * SQUARE_SIZE, r * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE);
+      }
+    }
+    
+    fill(CLOUD);
+    for (int r = 2; r < 4; r++) {
+      for (int c = 10; c < 14; c++) {
+        rect(c * SQUARE_SIZE, r * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE);
+      }
+    }
+    
+    fill(CLOUD);
+    for (int r = 8; r < 10; r++) {
+      for (int c = 14; c < 18; c++) {
+        rect(c * SQUARE_SIZE, r * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE);
+      }
+    }
+    
+    fill(CLOUD);
+    for (int r = 4; r < 5; r++) {
+      for (int c = 6; c < 10; c++) {
+        rect(c * SQUARE_SIZE, r * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE);
+      }
+    }
+    
+    fill(CLOUD);
+    for (int r = 11; r < 13; r++) {
+      for (int c = 1; c < 4; c++) {
+        rect(c * SQUARE_SIZE, r * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE);
+      }
+    }
+    
+  }
+}
