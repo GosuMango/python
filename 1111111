@@ -1,1 +1,22 @@
-for (int x = 0; x < this.m.size(); x++)
+public void mult(Matrix a) {
+    ArrayList<double[]> temp = new ArrayList<double[]>();
+
+    for (int c = 0; c < a.m.size(); c++) {
+        double[] columnA = a.m.get(c);
+        double[] newColumn = new double[POINT_SIZE];
+
+        for (int r = 0; r < POINT_SIZE; r++) {
+            double sum = 0;
+
+            for (int x = 0; x < this.m.size(); x++) {
+                sum += this.m.get(x)[r] * columnA[x];
+            }
+
+            newColumn[r] = sum;
+        }
+
+        temp.add(newColumn);
+    }
+
+    this.m = temp;
+}
